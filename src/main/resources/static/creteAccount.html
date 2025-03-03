@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Account</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Page Layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styling */
+        label {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #5c9ded;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Response message */
+        #responseMessage {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Error message */
+        .error {
+            color: red;
+        }
+
+        /* Success message */
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h1>Create New Account</h1>
+    <form id="accountForm">
+        <!-- Account Type Selection -->
+        <label for="accountType">Account Type:</label>
+        <select id="accountType" name="accountType" required>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+        </select>
+
+        <!-- Name Input -->
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <!-- Password Input -->
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Create Account</button>
+    </form>
+
+    <div id="responseMessage"></div>
+</div>
+
+<script>
+    // Handle form submission
+    document.getElementById('accountForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const name = document.getElementById('name').value;
+        const password = document.getElementById('password').value;
+        const accountType = document.getElementById('accountType').value;
+
+        // Define the API endpoint based on the selected account type
+        const apiEndpoint = accountType === 'student' ? 'http://localhost:8080/students' : 'http://localhost:8080/teachers';
+
+        // Send POST request to the appropriate endpoint
+        fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                password: password,
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error creating account. Status: ' + response.status);
+                }
+                return response.json(); // Parse JSON response if success
+            })
+            .then(data => {
+                document.getElementById('responseMessage').innerHTML = accountType.charAt(0).toUpperCase() + accountType.slice(1) + ' Created Successfully!';
+                document.getElementById('responseMessage').className = 'success';
+                console.log(data);
+                setTimeout(() => {
+                    window.location.href = 'login.html';  // Redirect to login page after account creation
+                }, 1000); // Adjust the redirect time as needed
+            })
+            .catch(error => {
+                document.getElementById('responseMessage').innerHTML = 'Error creating account: ' + error.message;
+                document.getElementById('responseMessage').className = 'error';
+                console.error('Error:', error);
+            });
+    });
+</script>
+
+</body>
+</html>
